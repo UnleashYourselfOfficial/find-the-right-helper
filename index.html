@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+    <title>Who Is the Right Helper? - Mahabharata Kids Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Comic+Neue:wght@700&display=swap');
+
+        :root {
+            --primary-font: 'Comic Neue', cursive;
+            --secondary-font: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background-color: #1a2e1a;
+            overflow: hidden;
+            font-family: var(--primary-font);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+
+            background-image: url('assets/forest.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 10;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Ved Vyasa - Left Side */
+        #vyasa-container {
+            position: absolute;
+            bottom: 10%;
+            left: 5%;
+            width: 30%;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 20;
+        }
+
+        #vyasa-img {
+            width: 100%;
+            height: auto;
+            max-height: 80%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+        }
+
+        /* Speech Bubble */
+        .speech-bubble {
+            position: relative;
+            background: #fff;
+            border-radius: 2rem;
+            padding: 1.5rem 2rem;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 300px;
+            text-align: center;
+            font-size: 1.5rem;
+            color: #333;
+            border: 4px solid #8b4513;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 20px 20px 0;
+            border-style: solid;
+            border-color: #fff transparent transparent;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Start Screen */
+        #start-screen {
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #start-btn {
+            position: absolute;
+            bottom: 40%;
+            right: 35%;
+            background-image: url('assets/start_button.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 500px;
+            height: 120px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s, filter 0.2s;
+            background-color: transparent;
+            animation: startPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes startPulse {
+
+            0% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-8px) scale(1.05);
+            }
+
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+        }
+
+        #start-btn:hover {
+            transform: scale(1.1);
+            filter: brightness(1.1);
+        }
+
+        #start-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Game Screen */
+        #game-screen {
+            justify-content: flex-end;
+            align-items: center;
+            padding-right: 12%;
+        }
+
+        #instruction-text {
+            position: absolute;
+            top: 8%;
+            right: 0.2%;
+            /* left: 65%; */
+            transform: translateX(-50%);
+
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+
+            font-size: 3.2rem;
+            letter-spacing: 2px;
+
+            color: #ffffff;
+            
+            /* layered shadow */
+            text-shadow:
+                0 4px 8px rgba(0, 0, 0, 1),
+                0 8px 20px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(0, 0, 0, 0.4);
+
+            z-index: 30;
+        }
+
+        #characters-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            width: 65%;
+            height: 60%;
+            margin-bottom: 0%;
+        }
+
+        .character-wrapper {
+            position: relative;
+            width: 250px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .character-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        .character-img {
+            width: 100%;
+            height: auto;
+            max-height: 80%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
+        }
+
+        /* Feedback Messages */
+        #feedback-message {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+            color: #ffeb3b;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 30px;
+            border-radius: 50px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        /* Ganesha Success Effects */
+        .ganesha-glow {
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8)) !important;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 40px rgba(255, 215, 0, 1));
+            }
+        }
+
+
+
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+            #instruction-text {
+                font-size: 2rem;
+            }
+
+            .character-wrapper {
+                width: 180px;
+            }
+
+            #start-btn {
+                width: 220px;
+                height: 90px;
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #characters-container {
+                width: 90%;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+            }
+
+            .character-wrapper {
+                width: 150px;
+                height: 40%;
+            }
+
+            #vyasa-container {
+                width: 20%;
+            }
+
+            .speech-bubble {
+                font-size: 1rem;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <!-- Persistent Vyasa -->
+        <div id="vyasa-container">
+            <div class="speech-bubble" id="vyasa-bubble">
+                Who can help me write the Mahabharata?
+            </div>
+            <img src="assets/vyasa.png" id="vyasa-img" alt="Ved Vyasa" referrerPolicy="no-referrer">
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <button id="start-btn"></button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <h1 id="instruction-text">Who is the right helper?</h1>
+
+            <div id="characters-container">
+                <!-- Monkey -->
+                <div class="character-wrapper" id="monkey" onclick="handleChoice('monkey')">
+                    <img src="assets/monkey.png" class="character-img" id="monkey-img">
+                </div>
+
+                <!-- Parrot -->
+                <div class="character-wrapper" id="parrot" onclick="handleChoice('parrot')">
+                    <img src="assets/parrot.png" class="character-img" id="parrot-img">
+                </div>
+
+                <!-- Ganesha -->
+                <div class="character-wrapper" id="ganesha" onclick="handleChoice('ganesha')">
+                    <img src="assets/ganesha.png" class="character-img" id="ganesha-img" alt="Ganesha"
+                        referrerPolicy="no-referrer">
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback UI -->
+        <div id="feedback-message"></div>
+
+        <audio id="forest-audio" src="assets/forest.mp3" loop preload="auto"></audio>
+        <audio id="monkey-audio" src="assets/monkey.mp3"></audio>
+        <audio id="click-audio" src="assets/click.mp3"></audio>
+        <audio id="success-audio" src="assets/success.mp3"></audio>
+        <audio id="cheer-audio" src="assets/cheer.mp3"></audio>
+        <audio id="parrot-audio" src="assets/parrot.mp3"></audio>
+    </div>
+
+    <script>
+        const state = {
+            screen: 'start',
+            choicesMade: new Set(),
+            isGameOver: false
+        };
+
+        const startBtn = document.getElementById('start-btn');
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const feedbackMsg = document.getElementById('feedback-message');
+        const vyasaBubble = document.getElementById('vyasa-bubble');
+
+        const forestAudio = document.getElementById('forest-audio');
+        const monkeyAudio = document.getElementById('monkey-audio');
+        const clickAudio = document.getElementById('click-audio');
+        const successAudio = document.getElementById('success-audio');
+        const cheerAudio = document.getElementById('cheer-audio');
+        const parrotAudio = document.getElementById('parrot-audio');
+
+
+        forestAudio.volume = 0.35;
+
+        // try autoplay
+        window.addEventListener("load", () => {
+            forestAudio.play().catch(() => {
+                console.log("Autoplay blocked until user interaction");
+            });
+        });
+
+
+
+        // Start Game
+        startBtn.addEventListener('click', () => {
+
+            clickAudio.currentTime = 0;
+            clickAudio.play();
+
+            forestAudio.volume = 0.4;
+            forestAudio.play();
+
+            startScreen.classList.remove('active');
+            gameScreen.classList.add('active');
+            state.screen = 'game';
+            vyasaBubble.innerText = "Hmm... I need someone wise and patient.";
+        });
+
+        function showFeedback(text, duration = 2000) {
+            feedbackMsg.innerText = text;
+            feedbackMsg.style.opacity = '1';
+            setTimeout(() => {
+                feedbackMsg.style.opacity = '0';
+            }, duration);
+        }
+
+        function handleChoice(choice) {
+            if (state.isGameOver || state.choicesMade.has(choice)) return;
+
+            if (choice === 'monkey') {
+                animateMonkey();
+            } else if (choice === 'parrot') {
+                animateParrot();
+            } else if (choice === 'ganesha') {
+                animateGanesha();
+            }
+        }
+
+
+        function animateMonkey() {
+            const monkey = document.getElementById('monkey');
+            monkeyAudio.currentTime = 0;
+            monkeyAudio.play();
+            state.choicesMade.add('monkey');
+            showFeedback("Oops! Too playful!");
+
+            // Jump and run off animation
+            let startTime = null;
+            const duration = 1500;
+
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = timestamp - startTime;
+                const t = progress / duration;
+
+                if (t < 0.4) {
+                    // Jump up
+                    const jumpT = t / 0.4;
+                    const y = -200 * Math.sin(jumpT * Math.PI);
+                    monkey.style.transform = `translateY(${y}px)`;
+                } else if (t < 0.6) {
+                    // Bounce
+                    const bounceT = (t - 0.4) / 0.2;
+                    const y = -50 * Math.sin(bounceT * Math.PI);
+                    monkey.style.transform = `translateY(${y}px)`;
+                } else {
+                    // Run off
+                    const runT = (t - 0.6) / 0.4;
+                    const x = 1000 * runT;
+                    monkey.style.transform = `translateX(${x}px) rotate(${runT * 20}deg)`;
+                    monkey.style.opacity = 1 - runT;
+                }
+
+                if (progress < duration) {
+                    requestAnimationFrame(step);
+                } else {
+                    monkey.style.display = 'none';
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        function animateParrot() {
+            parrotAudio.currentTime = 0;
+            parrotAudio.play();
+
+            const parrot = document.getElementById('parrot');
+            state.choicesMade.add('parrot');
+            showFeedback("Too noisy!");
+
+            // Flap and shake
+
+            let startTime = null;
+            const duration = 1000;
+
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = timestamp - startTime;
+                const t = progress / duration;
+
+                const shake = Math.sin(t * Math.PI * 10) * 10;
+                const scale = 1 + Math.sin(t * Math.PI * 5) * 0.1;
+
+                parrot.style.transform = `translateX(${shake}px) scale(${scale})`;
+
+                if (progress < duration) {
+                    requestAnimationFrame(step);
+                } else {
+                    parrot.style.transform = 'none';
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        function animateGanesha() {
+
+            successAudio.currentTime = 0;
+            successAudio.play();
+
+            cheerAudio.currentTime = 0;
+            cheerAudio.play();
+
+            state.isGameOver = true;
+            const ganesha = document.getElementById('ganesha');
+            const ganeshaImg = document.getElementById('ganesha-img');
+
+            showFeedback("Yes! Ganesha is wise and patient!", 4000);
+            vyasaBubble.innerText = "Perfect! Lord Ganesha will write the Mahabharata.";
+
+            // Success animations
+            ganeshaImg.classList.add('ganesha-glow');
+
+            // Floating motion
+            let startTime = null;
+            function floatStep(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = timestamp - startTime;
+                const y = Math.sin(progress / 500) * 20;
+                ganesha.style.transform = `translateY(${y}px)`;
+                requestAnimationFrame(floatStep);
+            }
+            requestAnimationFrame(floatStep);
+
+            setTimeout(makeConfetti, 300);
+        }
+
+        function makeConfetti() {
+
+            var end = Date.now() + (2 * 1000);
+
+            const colors = [
+                '#ff4d4d',
+                '#0066ff',
+                '#00cc66',
+                '#ff66cc',
+                '#ffffff',
+                '#6633ff'
+            ];
+
+            function frame() {
+
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: colors,
+                    scalar: 1.3
+                });
+
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: colors
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }
+
+            frame();
+        }
+
+        // Handle window resize to maintain aspect ratio if needed
+        window.addEventListener('resize', () => {
+            // The CSS aspect-ratio handles most of it
+        });
+    </script>
+</body>
+
+</html>
