@@ -37,9 +37,13 @@
             /* position: relative;
             width: 100vw;
             height: 100vh; */
-            position: relative;
+            /* position: relative;
             width: 1280px;
-            height: 720px;
+            height: 720px; */
+
+            position: relative;
+            width: 100%;
+            height: 100%;
 
             background-image: url('assets/forest.png');
             background-size: cover;
@@ -636,25 +640,6 @@
             frame();
         }
 
-        function scaleGame() {
-
-            const game = document.getElementById("game-container");
-
-            const baseWidth = 1280;
-            const baseHeight = 720;
-
-            const scaleX = window.innerWidth / baseWidth;
-            const scaleY = window.innerHeight / baseHeight;
-
-            const scale = Math.min(scaleX, scaleY);
-
-            game.style.transform = `scale(${scale})`;
-            game.style.transformOrigin = "top center";
-
-        }
-
-        window.addEventListener("resize", scaleGame);
-        window.addEventListener("load", scaleGame);
 
         // Handle window resize to maintain aspect ratio if needed
         window.addEventListener('resize', () => {
