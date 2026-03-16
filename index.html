@@ -34,9 +34,12 @@
         }
 
         #game-container {
-            position: relative;
+            /* position: relative;
             width: 100vw;
-            height: 100vh;
+            height: 100vh; */
+            position: relative;
+            width: 1280px;
+            height: 720px;
 
             background-image: url('assets/forest.png');
             background-size: cover;
@@ -65,9 +68,9 @@
         /* Ved Vyasa - Left Side */
         #vyasa-container {
             position: absolute;
-            bottom: 10%;
-            left: 5%;
-            width: 30%;
+            bottom: 5px;
+            left: 60px;
+            width: 320px;
             height: 80%;
             display: flex;
             flex-direction: column;
@@ -129,7 +132,7 @@
             flex-direction: column;
         }
 
-        #start-btn {
+        /* #start-btn {
             position: absolute;
             bottom: 40%;
             right: 35%;
@@ -150,6 +153,41 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             transition: transform 0.2s, filter 0.2s;
             background-color: transparent;
+            animation: startPulse 2s ease-in-out infinite;
+        } */
+
+        #start-btn {
+            position: absolute;
+
+            top: 50%;
+            left: 35%;
+
+            transform: translate(-50%, -50%);
+
+            background-image: url('assets/start_button.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+
+            width: 500px;
+            height: 120px;
+
+            border: none;
+            cursor: pointer;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            color: #fff;
+            font-size: 2rem;
+            font-weight: bold;
+
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+
+            transition: transform 0.2s, filter 0.2s;
+            background-color: transparent;
+
             animation: startPulse 2s ease-in-out infinite;
         }
 
@@ -199,7 +237,7 @@
             letter-spacing: 2px;
 
             color: #ffffff;
-            
+
             /* layered shadow */
             text-shadow:
                 0 4px 8px rgba(0, 0, 0, 1),
@@ -209,13 +247,25 @@
             z-index: 30;
         }
 
+        /* #characters-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            width: 900px;
+            height: 60%;
+            margin-bottom: 0%;
+        } */
+
         #characters-container {
             display: flex;
             justify-content: space-around;
             align-items: flex-end;
-            width: 65%;
+
+            width: 900px;
             height: 60%;
-            margin-bottom: 0%;
+
+            margin-left: 400px;
+            /* creates gap from Vyasa */
         }
 
         .character-wrapper {
@@ -585,6 +635,26 @@
 
             frame();
         }
+
+        function scaleGame() {
+
+            const game = document.getElementById("game-container");
+
+            const baseWidth = 1280;
+            const baseHeight = 720;
+
+            const scaleX = window.innerWidth / baseWidth;
+            const scaleY = window.innerHeight / baseHeight;
+
+            const scale = Math.min(scaleX, scaleY);
+
+            game.style.transform = `scale(${scale})`;
+            game.style.transformOrigin = "top center";
+
+        }
+
+        window.addEventListener("resize", scaleGame);
+        window.addEventListener("load", scaleGame);
 
         // Handle window resize to maintain aspect ratio if needed
         window.addEventListener('resize', () => {
