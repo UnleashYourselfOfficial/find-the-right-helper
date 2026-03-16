@@ -199,7 +199,7 @@
             letter-spacing: 2px;
 
             color: #ffffff;
-            
+
             /* layered shadow */
             text-shadow:
                 0 4px 8px rgba(0, 0, 0, 1),
@@ -278,6 +278,32 @@
             }
         }
 
+
+
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+            #instruction-text {
+                font-size: 2rem;
+            }
+
+            .character-wrapper {
+                width: 180px;
+            }
+
+            #start-btn {
+                width: 220px;
+                height: 90px;
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #characters-container {
+                width: 90%;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+            }
 
             .character-wrapper {
                 width: 150px;
